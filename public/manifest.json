@@ -1,0 +1,9 @@
+{
+  "name": "Grambo Family Hub",
+  "short_name": "Family Hub",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": []
+}
