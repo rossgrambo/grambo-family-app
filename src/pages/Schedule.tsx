@@ -28,7 +28,6 @@ interface Layout {
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 const DAY_TITLE = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const DAY_MINUTES = 24 * 60;
 const PX_PER_HOUR = 60;
 const PX_PER_MIN = PX_PER_HOUR / 60;
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
@@ -172,21 +171,53 @@ export function Schedule() {
           ))}
         </div>
 
-        {layout.columns.map((col, ci) => (
-          <div class="day-column" key={`${col.type}-${col.person}-${ci}`}>
-            <div class="day-column-header">{col.title || col.person}</div>
-            <div class="day-column-body" style={{ height: 24 * PX_PER_HOUR + 'px' }}>
-              {HOURS.map(h => (
-                <div class="hour-line" key={h} style={{ top: h * PX_PER_HOUR + 'px' }} />
-              ))}
-              <div
-                class="now-line"
-                style={{ top: nowMinutes * PX_PER_MIN + 'px' }}
-                ref={ci === 0 ? nowLineRef : undefined}
-              />
+        {layout.columns.map((col, ci) => {
+          if (col.type === 'tasks') {
+            const steps = pickDay(schedules[col.person], dayKey)
+              .slice()
+              .sort((a, b) => minutesFromHHMM(a.time) - minutesFromHHMM(b.time));
+            const currentIndex = taskStates[col.person] ?? 0;
+            return (
+              <div class="day-column day-column-tasks" key={`${col.type}-${col.person}-${ci}`}>
+                <div class="day-column-header">{col.title || col.person}</div>
+                <div class="task-list">
+                  {steps.map((s, i) => {
+                    const status = i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'upcoming';
+                    const onClick = () => {
+                      if (i + 1 === currentIndex) setStepIndex(col.person, i);
+                      else setStepIndex(col.person, i + 1);
+                    };
+                    return (
+                      <div
+                        key={i}
+                        class={`task-item task-${status}`}
+                        onClick={onClick}
+                        role="button"
+                      >
+                        <span class="task-item-label">{s.label}</span>
+                        <span class="task-item-time">{s.time}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
 
-              {col.type === 'calendar' &&
-                pickDay(calendars[col.person], dayKey).map((b, i) => {
+          return (
+            <div class="day-column" key={`${col.type}-${col.person}-${ci}`}>
+              <div class="day-column-header">{col.title || col.person}</div>
+              <div class="day-column-body" style={{ height: 24 * PX_PER_HOUR + 'px' }}>
+                {HOURS.map(h => (
+                  <div class="hour-line" key={h} style={{ top: h * PX_PER_HOUR + 'px' }} />
+                ))}
+                <div
+                  class="now-line"
+                  style={{ top: nowMinutes * PX_PER_MIN + 'px' }}
+                  ref={ci === 0 ? nowLineRef : undefined}
+                />
+
+                {pickDay(calendars[col.person], dayKey).map((b, i) => {
                   const start = minutesFromHHMM(b.start);
                   const end = minutesFromHHMM(b.end);
                   const height = Math.max(0, end - start) * PX_PER_MIN;
@@ -201,38 +232,10 @@ export function Schedule() {
                     </div>
                   );
                 })}
-
-              {col.type === 'tasks' && (() => {
-                const steps = pickDay(schedules[col.person], dayKey);
-                const currentIndex = taskStates[col.person] ?? 0;
-                return steps.map((s, i) => {
-                  const start = minutesFromHHMM(s.time);
-                  const nextStart = i + 1 < steps.length
-                    ? minutesFromHHMM(steps[i + 1].time)
-                    : DAY_MINUTES;
-                  const duration = Math.max(20, nextStart - start);
-                  const status = i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'upcoming';
-                  const onClick = () => {
-                    if (i + 1 === currentIndex) setStepIndex(col.person, i);
-                    else setStepIndex(col.person, i + 1);
-                  };
-                  return (
-                    <div
-                      key={i}
-                      class={`task-block task-${status}`}
-                      style={{ top: start * PX_PER_MIN + 'px', height: duration * PX_PER_MIN + 'px' }}
-                      onClick={onClick}
-                      role="button"
-                    >
-                      <div class="task-block-time">{s.time}</div>
-                      <div class="task-block-label">{s.label}</div>
-                    </div>
-                  );
-                });
-              })()}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
