@@ -1,11 +1,13 @@
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 export function Nav() {
   const current = location.pathname;
   const search = location.search;
   const links = [
-    { href: '/', label: 'Schedule' },
-    { href: '/knowledge', label: 'Knowledge' },
-    { href: '/tasks', label: 'Tasks' },
-    { href: '/settings', label: '⚙' },
+    { href: BASE + '/', label: 'Schedule' },
+    { href: BASE + '/knowledge', label: 'Knowledge' },
+    { href: BASE + '/tasks', label: 'Tasks' },
+    { href: BASE + '/settings', label: '⚙' },
   ];
 
   return (

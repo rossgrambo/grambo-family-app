@@ -7,6 +7,9 @@ import { Tasks } from './pages/Tasks.tsx';
 import { Settings } from './pages/Settings.tsx';
 import { getSettings } from './lib/settings.ts';
 
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+const p = (path: string) => BASE + path;
+
 export function App() {
   const [configured, setConfigured] = useState(false);
 
@@ -24,10 +27,11 @@ export function App() {
       <Nav />
       <main>
         <Router>
-          <Route path="/" component={Schedule} />
-          <Route path="/knowledge" component={Knowledge} />
-          <Route path="/tasks" component={Tasks} />
-          <Route path="/settings" component={() => <Settings onSave={() => {}} />} />
+          <Route path={p('/')} component={Schedule} />
+          <Route path={p('/knowledge')} component={Knowledge} />
+          <Route path={p('/tasks')} component={Tasks} />
+          <Route path={p('/settings')} component={() => <Settings onSave={() => {}} />} />
+          <Route default component={Schedule} />
         </Router>
       </main>
     </div>

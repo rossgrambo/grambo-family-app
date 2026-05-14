@@ -23,8 +23,6 @@ body {
 }
 
 .app {
-  max-width: 480px;
-  margin: 0 auto;
   padding-bottom: 72px;
 }
 
@@ -58,8 +56,10 @@ body {
   font-weight: 600;
 }
 
-/* Page */
+/* Page (narrow, mobile-shaped pages: Knowledge / Tasks / Settings) */
 .page {
+  max-width: 480px;
+  margin: 0 auto;
   padding: 20px 16px;
 }
 
@@ -349,3 +349,119 @@ button.primary {
 }
 
 .modal-actions button { padding: 10px 20px; }
+
+/* Schedule day view — full-width, no max-width applied */
+.schedule-day {
+  padding: 12px 12px 80px;
+}
+
+.schedule-day-title {
+  font-size: 22px;
+  margin: 0 0 12px 12px;
+}
+
+.day-grid {
+  display: grid;
+  gap: 8px;
+  align-items: start;
+}
+
+.time-gutter {
+  position: relative;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding-top: 32px; /* aligns with column headers */
+}
+
+.hour-label {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+}
+
+.day-column {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.day-column-header {
+  background: var(--surface2);
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  height: 32px;
+}
+
+.day-column-body {
+  position: relative;
+  background: var(--surface);
+}
+
+.hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 4;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(233, 69, 96, 0.6);
+}
+
+.cal-block {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  overflow: hidden;
+  color: #fff;
+  z-index: 2;
+  box-shadow: inset 3px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.cal-block-time { font-size: 11px; opacity: 0.85; }
+.cal-block-label { font-weight: 600; line-height: 1.2; }
+
+.cal-sleep   { background: #3b4a8a; }
+.cal-work    { background: #b94c84; }
+.cal-family  { background: #4e8a7a; }
+.cal-leisure { background: #c08a3e; }
+.cal-other   { background: var(--surface2); }
+
+.task-block {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  background: var(--surface2);
+  cursor: pointer;
+  border-left: 4px solid var(--text-muted);
+  overflow: hidden;
+  z-index: 2;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.task-block-time { font-size: 11px; color: var(--text-muted); }
+.task-block-label { margin-top: 2px; line-height: 1.2; }
+
+.task-done    { opacity: 0.4; border-left-color: var(--done); }
+.task-current { border-left-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.task-upcoming { border-left-color: var(--text-muted); }
