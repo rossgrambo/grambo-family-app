@@ -11,6 +11,19 @@ async function ghFetch(path: string): Promise<Response> {
   });
 }
 
+function b64DecodeUtf8(b64: string): string {
+  const bin = atob(b64);
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+function b64EncodeUtf8(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
 export async function fetchFile(path: string): Promise<string> {
   const { content } = await fetchFileWithMeta(path);
   return content;
@@ -20,7 +33,7 @@ export async function fetchFileWithMeta(path: string): Promise<{ content: string
   const res = await ghFetch(path);
   if (!res.ok) throw new Error(`GitHub API ${res.status}: ${path}`);
   const data = await res.json();
-  return { content: atob(data.content), sha: data.sha };
+  return { content: b64DecodeUtf8(data.content), sha: data.sha };
 }
 
 export async function updateFile(path: string, content: string, sha: string, message: string): Promise<void> {
@@ -32,7 +45,7 @@ export async function updateFile(path: string, content: string, sha: string, mes
       Authorization: `token ${token}`,
       Accept: 'application/vnd.github.v3+json',
     },
-    body: JSON.stringify({ message, content: btoa(content), sha }),
+    body: JSON.stringify({ message, content: b64EncodeUtf8(content), sha }),
   });
   if (!res.ok) throw new Error(`GitHub API ${res.status}: failed to update ${path}`);
 }
