@@ -227,8 +227,8 @@ export function Schedule() {
                       class={`cal-block cal-${b.color || 'other'}`}
                       style={{ top: start * PX_PER_MIN + 'px', height: height + 'px' }}
                     >
-                      <div class="cal-block-time">{b.start}–{b.end}</div>
-                      <div class="cal-block-label">{b.label}</div>
+                      <span class="cal-block-label">{b.label}</span>{' '}
+                      <span class="cal-block-time">{b.start}–{b.end}</span>
                     </div>
                   );
                 })}
