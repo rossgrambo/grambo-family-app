@@ -32,12 +32,8 @@ const PX_PER_HOUR = 60;
 const PX_PER_MIN = PX_PER_HOUR / 60;
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
-function today(): string {
-  return DAYS[new Date().getDay()];
-}
-
-function todayTitle(): string {
-  return DAY_TITLE[new Date().getDay()];
+function todayIndex(): number {
+  return new Date().getDay();
 }
 
 function minutesFromHHMM(t: string): number {
@@ -67,6 +63,7 @@ export function Schedule() {
   const [schedules, setSchedules] = useState<Record<string, DayMap<TaskStep>>>({});
   const [taskStates, setTaskStates] = useState<Record<string, number>>({});
   const [now, setNow] = useState(new Date());
+  const [dayIndex, setDayIndex] = useState(todayIndex());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const nowLineRef = useRef<HTMLDivElement | null>(null);
@@ -143,7 +140,9 @@ export function Schedule() {
     })();
   }, []);
 
-  const dayKey = today();
+  const dayKey = DAYS[dayIndex];
+  const dayTitle = DAY_TITLE[dayIndex];
+  const isToday = dayIndex === todayIndex();
 
   const setStepIndex = async (person: string, newIndex: number) => {
     setTaskStates(prev => ({ ...prev, [person]: newIndex }));
@@ -161,7 +160,23 @@ export function Schedule() {
 
   return (
     <div class="schedule-day">
-      <h2 class="schedule-day-title">{todayTitle()}</h2>
+      <div class="schedule-day-header">
+        <button
+          class="day-nav-btn"
+          onClick={() => setDayIndex((dayIndex + 6) % 7)}
+          aria-label="Previous day"
+        >
+          ‹
+        </button>
+        <h2 class="schedule-day-title">{dayTitle}</h2>
+        <button
+          class="day-nav-btn"
+          onClick={() => setDayIndex((dayIndex + 1) % 7)}
+          aria-label="Next day"
+        >
+          ›
+        </button>
+      </div>
       <div class="day-grid" style={gridStyle}>
         <div class="time-gutter" style={{ height: 24 * PX_PER_HOUR + 'px' }}>
           {HOURS.map(h => (
@@ -211,11 +226,13 @@ export function Schedule() {
                 {HOURS.map(h => (
                   <div class="hour-line" key={h} style={{ top: h * PX_PER_HOUR + 'px' }} />
                 ))}
-                <div
-                  class="now-line"
-                  style={{ top: nowMinutes * PX_PER_MIN + 'px' }}
-                  ref={ci === 0 ? nowLineRef : undefined}
-                />
+                {isToday && (
+                  <div
+                    class="now-line"
+                    style={{ top: nowMinutes * PX_PER_MIN + 'px' }}
+                    ref={ci === 0 ? nowLineRef : undefined}
+                  />
+                )}
 
                 {pickDay(calendars[col.person], dayKey).map((b, i) => {
                   const start = minutesFromHHMM(b.start);
